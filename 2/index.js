@@ -1,0 +1,1 @@
+document.write("<h1>这是一个标题</h1>");
