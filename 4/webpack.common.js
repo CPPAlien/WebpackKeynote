@@ -1,7 +1,12 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
+const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
+
+const gitRevisionPlugin = new GitRevisionPlugin({
+  versionCommand: 'rev-list HEAD --count --no-merges',
+});
 
 module.exports = {
   entry: {
@@ -46,9 +51,15 @@ module.exports = {
   plugins: [
     // make sure to include the plugin!
     new VueLoaderPlugin(),
-    new HtmlWebpackPlugin(),
     new CopyWebpackPlugin([{
       from: path.resolve(__dirname, './src'), to: path.resolve(__dirname, './dist'), ignore: ['*.js', '*.vue']
+    }]),
+    new ReplaceInFileWebpackPlugin([{
+      dir: 'dist',
+      rules: [{
+        search: '@version',
+        replace: gitRevisionPlugin.version(),
+      }],
     }]),
   ]
 }
